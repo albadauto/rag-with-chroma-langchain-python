@@ -1,10 +1,13 @@
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFDirectoryLoader
+from langchain_qdrant import Qdrant, QdrantVectorStore
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 load_dotenv()
 PASTA_BASE = "base"
+COLLECTION_NAME = "RAG_TUTORIAL"
+
 
 def create_db():
     #Carrega documento
@@ -30,7 +33,13 @@ def set_chunks(documents):
     return chunks
 
 def vectorize_chunks(chunks):
-    Chroma.from_documents(chunks, OpenAIEmbeddings(), persist_directory="db")
-    print("DB criada com sucesso!")
+    QdrantVectorStore.from_documents(
+        documents=chunks,
+        embedding=OpenAIEmbeddings(),
+        url="http://localhost:6333",
+        collection_name=COLLECTION_NAME
+    )
+    print("Db criada com sucesso")
+
 
 create_db()
